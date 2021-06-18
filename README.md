@@ -1,15 +1,13 @@
 # dialTimePicker
 A custom time picker library for Android.
 <br>
-As a result of needing a fixed time picker for pre-lollipop devices, for my
-[alarm app](https://play.google.com/store/apps/details?id=com.ugurtekbas.alarmshuffle) i developed a dial time picker view.
+This library was forked from [ugurtekbas's library.](https://github.com/ugurtekbas/dialTimePicker)
+<br>
 Calculations in the main class mostly based on [erz05's view.](https://github.com/erz05/TimePicker)
 
-[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-dialTimePicker-green.svg?style=true)](https://android-arsenal.com/details/1/3244)
-
 <H2>Images</H2>
-<img width="270px" height="480" src="/images/1.png" />
-<img width="270px" height="480" src="/images/2.png" />
+<img width="270px" height="585" src="/images/Etzio1.jpg" />
+<img width="270px" height="585" src="/images/Etzio2.jpg" />
 <br>
 
 <H2>Usage</H2>
@@ -26,7 +24,7 @@ repositories {
 Add the dependency in your build file (do not forget to specify the correct qualifier, usually 'aar'):
 ```groovy
 dependencies {
-    compile 'com.github.ugurtekbas:dialTimePicker:8d263fc3a1'
+    compile 'https://github.com/wprenison/EtzioTimePicker:{Latest Version}'
 }
 ```
 
@@ -64,6 +62,8 @@ picker.setCanvasColor(Color.WHITE);
 picker.setDialColor(Color.ORANGE);
 //Set clock color
 picker.setClockColor(Color.CYAN);
+//Set clock face color
+picker.setClockFaceColor(Color.WHITE);
 //Set text color
 picker.setTextColor(Color.BLACK);
 //Enable 24 or 12 hour clock
@@ -93,7 +93,7 @@ public void timeChanged(Date date){
 
 ```
 <H2>License</H2>
-    Copyright 2018 Ugur Tekbas
+    Copyright 2021 Weylin Renison
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
