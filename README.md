@@ -2,11 +2,12 @@
 A custom time picker library for Android.
 <br>
 This library was forked from [ugurtekbas's library.](https://github.com/ugurtekbas/dialTimePicker)
+<br>
 Calculations in the main class mostly based on [erz05's view.](https://github.com/erz05/TimePicker)
 
 <H2>Images</H2>
-<img width="270px" height="480" src="/images/Etzio1.jpg" />
-<img width="270px" height="480" src="/images/Etzio2.jpg" />
+<img width="270px" height="585" src="/images/Etzio1.jpg" />
+<img width="270px" height="585" src="/images/Etzio2.jpg" />
 <br>
 
 <H2>Usage</H2>
