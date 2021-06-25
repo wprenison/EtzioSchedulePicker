@@ -43,7 +43,20 @@ class Picker @JvmOverloads constructor(
     var currentMin = 0
         private set
     private var previousHour = 0
+
+    //********TEXT PROPERTIES****************
     private var textColor = Color.WHITE
+    private var prefixTextSizeInSp = 0
+    private var prefixTextSizeInPixels = 0f
+    private var dayTextSizeInSp = 0
+    private var dayTextSizeInPixels = 0f
+    private var suffixTextSizeInSp = 0
+    private var suffixTextSizeInPixels = 0f
+    private var timeTextSizeInSP = 0
+    private var timeTextSizeInPixels = 0f
+    private var amPmTextSizeInSp = 0
+    private var amPmTextSizeInPixels = 0f
+
     private var clockColor = Color.parseColor("#54A0FF")
     private var clockFaceColor = Color.parseColor("#80222f3e")
     private var dialColor = Color.parseColor("#2E86DE")
@@ -64,6 +77,13 @@ class Picker @JvmOverloads constructor(
     var amPM: String? = null
         private set
     private var timeListener: TimeChangedListener? = null
+
+    //***************DEFAULT FACTORS********************************
+    private val prefixTextSizeFactor = 24
+    private val dayTextSizeFactor = 12
+    private val suffixTextSizeFactor = 24
+    private val timeTextSizeFactor = 6
+    private val amPmTextSizeFactor = 12
 
     /**
      * Sets default theme attributes for picker
@@ -93,6 +113,9 @@ class Picker @JvmOverloads constructor(
         {
             val typedArray = context.obtainStyledAttributes(attrs, R.styleable.Picker)
             textColor = typedArray.getColor(R.styleable.Picker_textColor, textColor)
+            dayTextSizeInSp = typedArray.getDimensionPixelSize(R.styleable.Picker_dayTextSize, dayTextSizeInSp)
+            timeTextSizeInSP = typedArray.getDimensionPixelSize(R.styleable.Picker_timeTextSize, timeTextSizeInSP)
+            amPmTextSizeInSp = typedArray.getDimensionPixelSize(R.styleable.Picker_amPmTextSize, amPmTextSizeInSp)
             dialColor = typedArray.getColor(R.styleable.Picker_dialColor, dialColor)
             clockColor = typedArray.getColor(R.styleable.Picker_clockColor, clockColor)
             clockFaceColor =
@@ -124,6 +147,36 @@ class Picker @JvmOverloads constructor(
         radius = min / 2 - padding * 2
         dialRadius = if (dialRadiusDP != -1) dialRadiusDP.toFloat() else radius / 7
         rectF[-radius, -radius, radius] = radius
+
+        //Set defaults that require measure
+        prefixTextSizeInPixels = when (prefixTextSizeInSp) {
+            0 -> min / prefixTextSizeFactor
+            else -> TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, prefixTextSizeInSp.toFloat(), resources.displayMetrics)
+        }
+
+        dayTextSizeInPixels = when (dayTextSizeInSp)
+        {
+            0 -> min / dayTextSizeFactor
+            else -> TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, dayTextSizeInSp.toFloat(), resources.displayMetrics)
+        }
+
+        suffixTextSizeInPixels = when (suffixTextSizeInSp)
+        {
+            0 -> min / suffixTextSizeFactor
+            else -> TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, suffixTextSizeInSp.toFloat(), resources.displayMetrics)
+        }
+
+        timeTextSizeInPixels = when (timeTextSizeInSP)
+        {
+            0 -> min / timeTextSizeFactor
+            else -> TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, timeTextSizeInSP.toFloat(), resources.displayMetrics)
+        }
+
+        amPmTextSizeInPixels = when (amPmTextSizeInSp)
+        {
+            0 -> min / amPmTextSizeFactor
+            else -> TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, amPmTextSizeInSp.toFloat(), resources.displayMetrics)
+        }
     }
 
     override fun onDraw(canvas: Canvas)
@@ -154,7 +207,7 @@ class Picker @JvmOverloads constructor(
             //get AM/PM
             if (hourFormat)
             {
-                hour = degrees.toInt() / 15 % io.flyingmongoose.EtzioTimePicker.Picker.Companion.A_DAY_AS_HOURS
+                hour = degrees.toInt() / 15 % A_DAY_AS_HOURS
                 /**
                  * When minutes are set programmatically, because of rounding issues,
                  * new value of minutes might be different than the one is set.
@@ -163,7 +216,7 @@ class Picker @JvmOverloads constructor(
                  */
                 if (manualAdjust)
                 {
-                    currentMin = (degrees * 4).toInt() % io.flyingmongoose.EtzioTimePicker.Picker.Companion.AN_HOUR_AS_MINUTES
+                    currentMin = (degrees * 4).toInt() % AN_HOUR_AS_MINUTES
                     manualAdjust = false
                 }
                 mStr = if (currentMin < 10) "0$currentMin" else currentMin.toString() + ""
@@ -173,11 +226,11 @@ class Picker @JvmOverloads constructor(
                 if (manualAdjust)
                 {
                     //get Minutes
-                    currentMin = (degrees * 2).toInt() % io.flyingmongoose.EtzioTimePicker.Picker.Companion.AN_HOUR_AS_MINUTES
+                    currentMin = (degrees * 2).toInt() % AN_HOUR_AS_MINUTES
                     manualAdjust = false
                 }
-                hour = degrees.toInt() / 30 % io.flyingmongoose.EtzioTimePicker.Picker.Companion.HALF_DAY_AS_HOURS
-                if (hour == 0) hour = io.flyingmongoose.EtzioTimePicker.Picker.Companion.HALF_DAY_AS_HOURS
+                hour = degrees.toInt() / 30 % HALF_DAY_AS_HOURS
+                if (hour == 0) hour = HALF_DAY_AS_HOURS
                 mStr = if (currentMin < 10) "0$currentMin" else currentMin.toString()
                 //AM-PM
                 if (hour == 12 && previousHour == 11 || hour == 11 && previousHour == 12)
@@ -189,16 +242,34 @@ class Picker @JvmOverloads constructor(
         }
         previousHour = hour
 
+        //Draw Texts
         with(paint) {
             style = Paint.Style.FILL
             color = textColor
             alpha = if (isEnabled) paint.alpha else 77
-            textSize = min / 5
-            //the text which shows time
+
+            val offsetY = radius / 8
+
+            //Prefix Text
+            textSize = prefixTextSizeInPixels
+            canvas.drawText("Arrive", -radius / 2.5f, (-radius / 1.65f) + offsetY, paint)
+
+            //Day Text
+            textSize = dayTextSizeInPixels
+            canvas.drawText("Monday", 0f, (paint.textSize * -2f) + offsetY, paint)
+
+            //Suffix Text
+            textSize = suffixTextSizeInPixels
+            canvas.drawText("At", radius / 2.5f, (-radius / 3f) + offsetY, paint)
+
+            //Time Text
+            textSize = timeTextSizeInPixels
             hStr = if (hour < 10) "0$hour" else hour.toString() + ""
-            canvas.drawText("$hStr:$mStr", 0f, paint.textSize / 4, paint)
-            textSize = min / 10
-            canvas.drawText(amPM!!, 0f, paint.textSize * 2, paint)
+            canvas.drawText("$hStr:$mStr", 0f, (paint.textSize / 4) + offsetY, paint)
+
+            //AM / PM Text
+            textSize = amPmTextSizeInPixels
+            canvas.drawText(amPM!!, 0f, (paint.textSize * 2) + offsetY, paint)
         }
 
         //clocks dial
@@ -232,6 +303,7 @@ class Picker @JvmOverloads constructor(
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean
     {
         if (disableTouch || !isEnabled) return false
@@ -416,7 +488,7 @@ class Picker @JvmOverloads constructor(
         if (amPm && hour > 11)
         {
             amPm = !amPm
-        } else if (!amPm && (hour < io.flyingmongoose.EtzioTimePicker.Picker.Companion.HALF_DAY_AS_HOURS || hour == io.flyingmongoose.EtzioTimePicker.Picker.Companion.A_DAY_AS_HOURS))
+        } else if (!amPm && (hour < HALF_DAY_AS_HOURS || hour == A_DAY_AS_HOURS))
         {
             amPm = !amPm
         }
@@ -459,16 +531,16 @@ class Picker @JvmOverloads constructor(
         if (hourFormat)
         {
             amPM = ""
-            degrees = (this.hour % io.flyingmongoose.EtzioTimePicker.Picker.Companion.A_DAY_AS_HOURS * 15 + currentMin % io.flyingmongoose.EtzioTimePicker.Picker.Companion.AN_HOUR_AS_MINUTES / 4).toDouble()
+            degrees = (this.hour % A_DAY_AS_HOURS * 15 + currentMin % AN_HOUR_AS_MINUTES / 4).toDouble()
         } else
         {
-            if (this.hour == 0) this.hour = io.flyingmongoose.EtzioTimePicker.Picker.Companion.HALF_DAY_AS_HOURS
+            if (this.hour == 0) this.hour = HALF_DAY_AS_HOURS
             if (this.hour == 12 && previousHour == 11 || this.hour == 11 && previousHour == 12)
             {
                 amPm = !amPm
             }
             amPM = if (amPm) "AM" else "PM"
-            degrees = (this.hour % io.flyingmongoose.EtzioTimePicker.Picker.Companion.HALF_DAY_AS_HOURS * 30 + currentMin % io.flyingmongoose.EtzioTimePicker.Picker.Companion.AN_HOUR_AS_MINUTES / 2).toDouble()
+            degrees = (this.hour % HALF_DAY_AS_HOURS * 30 + currentMin % AN_HOUR_AS_MINUTES / 2).toDouble()
         }
         angle = Math.toRadians(degrees) - Math.PI / 2
         firstRun = false
@@ -485,12 +557,12 @@ class Picker @JvmOverloads constructor(
     {
         return if (is24Hour)
         {
-            (hour in 0..io.flyingmongoose.EtzioTimePicker.Picker.Companion.A_DAY_AS_HOURS
-                    && minute >= 0 && minute <= io.flyingmongoose.EtzioTimePicker.Picker.Companion.AN_HOUR_AS_MINUTES)
+            (hour in 0..A_DAY_AS_HOURS
+                    && minute >= 0 && minute <= AN_HOUR_AS_MINUTES)
         } else
         {
-            (hour in 0..io.flyingmongoose.EtzioTimePicker.Picker.Companion.HALF_DAY_AS_HOURS
-                    && minute >= 0 && minute <= io.flyingmongoose.EtzioTimePicker.Picker.Companion.AN_HOUR_AS_MINUTES)
+            (hour in 0..HALF_DAY_AS_HOURS
+                    && minute >= 0 && minute <= AN_HOUR_AS_MINUTES)
         }
     }
 

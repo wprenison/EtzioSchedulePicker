@@ -10,6 +10,16 @@
 
         <attr name="textColor" format="color" />
 
+        <attr name="prefixTextSize" format="dimension"/>
+
+        <attr name="dayTextSize" format="dimension" />
+
+        <attr name="suffixTextSize" format="dimension"/>
+
+        <attr name="timeTextSize" format="dimension" />
+
+        <attr name="amPmTextSize" format="dimension" />
+
         <attr name="dialColor" format="color" />
 
         <attr name="hourFormat" format="boolean" />
