@@ -9,7 +9,12 @@ import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStoreOwner
 import io.flyingmongoose.etzioTimePicker.library.R
+import io.flyingmongoose.exception.LifecycleOwnerNotFoundException
+import io.flyingmongoose.exception.ViewModelStoreOwnerNotFoundException
 import java.util.*
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -88,6 +93,9 @@ class TimePicker @JvmOverloads constructor(
     private val timeTextSizeFactor = 6
     private val amPmTextSizeFactor = 12
 
+    private lateinit var lifecycleOwner: LifecycleOwner
+    private lateinit var timeVModel: TimeVModel
+
     companion object
     {
         private const val AN_HOUR_AS_MINUTES = 60
@@ -112,7 +120,21 @@ class TimePicker @JvmOverloads constructor(
         hourFormat = DateFormat.is24HourFormat(getContext())
         amPm = Calendar.getInstance()[Calendar.AM_PM] == 0
         loadAppThemeDefaults()
-        loadAttributes(attrs)
+
+        initViewModels(attrs)
+        initObservers()
+    }
+
+    private fun initViewModels(attrs: AttributeSet?)
+    {
+        lifecycleOwner = context as? LifecycleOwner ?: throw LifecycleOwnerNotFoundException()
+        val viewModelStoreOwner = context as? ViewModelStoreOwner ?: throw ViewModelStoreOwnerNotFoundException()
+        timeVModel = ViewModelProvider(viewModelStoreOwner).get(TimeVModel::class.java)
+        loadAttributes(attrs, timeVModel)
+    }
+
+    private fun initObservers() {
+
     }
 
     /**
@@ -137,7 +159,7 @@ class TimePicker @JvmOverloads constructor(
      * Sets picker's attributes from xml file
      * @param attrs
      */
-    private fun loadAttributes(attrs: AttributeSet?)
+    private fun loadAttributes(attrs: AttributeSet?, timeVModel: TimeVModel)
     {
         if (attrs != null)
         {
@@ -179,7 +201,8 @@ class TimePicker @JvmOverloads constructor(
         rectF[-radius, -radius, radius] = radius
 
         //Set defaults that require measure
-        prefixTextSizeInPixels = when (prefixTextSizeInSp) {
+        prefixTextSizeInPixels = when (prefixTextSizeInSp)
+        {
             0 -> min / prefixTextSizeFactor
             else -> TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, prefixTextSizeInSp.toFloat(), resources.displayMetrics)
         }
@@ -420,7 +443,8 @@ class TimePicker @JvmOverloads constructor(
         invalidate()
     }
 
-    fun setDayText(newDayText: String) {
+    fun setDayText(newDayText: String)
+    {
         this.dayText = newDayText
         invalidate()
     }
