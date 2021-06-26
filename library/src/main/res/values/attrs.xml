@@ -3,31 +3,30 @@
 
     <declare-styleable name="Picker">
         <attr name="canvasColor" format="color" />
-
         <attr name="clockColor" format="color" />
-
         <attr name="clockFaceColor" format="color" />
-
         <attr name="textColor" format="color" />
-
-        <attr name="prefixTextSize" format="dimension"/>
-
+        <attr name="prefixTextSize" format="dimension" />
         <attr name="dayTextSize" format="dimension" />
-
-        <attr name="suffixTextSize" format="dimension"/>
-
+        <attr name="suffixTextSize" format="dimension" />
         <attr name="timeTextSize" format="dimension" />
-
         <attr name="amPmTextSize" format="dimension" />
-
         <attr name="dialColor" format="color" />
-
         <attr name="hourFormat" format="boolean" />
-
         <attr name="trackSize" format="dimension" />
-
         <attr name="dialRadius" format="dimension" />
+    </declare-styleable>
 
+    <declare-styleable name="DayPicker">
+        <attr name="focusable" format="boolean"/>
+        <attr name="includeWeekends" format="boolean"/>
+    </declare-styleable>
+
+    <declare-styleable name="ToggleFab">
+        <attr name="toggleActiveColor" format="color|reference" />
+        <attr name="toggleActiveIcon" format="reference" />
+        <attr name="toggleInactiveColor" format="color|reference" />
+        <attr name="toggleInactiveIcon" format="reference" />
     </declare-styleable>
 
     <string name="outOfRangeExceptionMessage"> Time value is out of range. \n "hour" value must be between 0 and 24, "minute" value must be between 0 and 60 </string>

@@ -1,4 +1,4 @@
-package io.flyingmongoose.EtzioTimePicker
+package io.flyingmongoose.etzioTimePicker
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -9,7 +9,7 @@ import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
-import io.flyingmongoose.EtzioTimePicker.library.R
+import io.flyingmongoose.etzioTimePicker.library.R
 import java.util.*
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -21,7 +21,7 @@ import kotlin.math.sin
  * @author Ugur Tekbas on 10.05.2015 (Original Fork: https://github.com/ugurtekbas/dialTimePicker)
  * @author Weylin Renison on 18.06.2021
  */
-class Picker @JvmOverloads constructor(
+class TimePicker @JvmOverloads constructor(
     context: Context?,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
@@ -48,10 +48,13 @@ class Picker @JvmOverloads constructor(
     private var textColor = Color.WHITE
     private var prefixTextSizeInSp = 0
     private var prefixTextSizeInPixels = 0f
+    private var prefixText = "Arrive"
     private var dayTextSizeInSp = 0
     private var dayTextSizeInPixels = 0f
+    private var dayText = "MONDAY"
     private var suffixTextSizeInSp = 0
     private var suffixTextSizeInPixels = 0f
+    private var suffixText = "At"
     private var timeTextSizeInSP = 0
     private var timeTextSizeInPixels = 0f
     private var amPmTextSizeInSp = 0
@@ -79,11 +82,38 @@ class Picker @JvmOverloads constructor(
     private var timeListener: TimeChangedListener? = null
 
     //***************DEFAULT FACTORS********************************
-    private val prefixTextSizeFactor = 24
+    private val prefixTextSizeFactor = 18
     private val dayTextSizeFactor = 12
-    private val suffixTextSizeFactor = 24
+    private val suffixTextSizeFactor = 18
     private val timeTextSizeFactor = 6
     private val amPmTextSizeFactor = 12
+
+    companion object
+    {
+        private const val AN_HOUR_AS_MINUTES = 60
+        private const val A_DAY_AS_HOURS = 24
+        private const val HALF_DAY_AS_HOURS = 12
+        const val AM = true
+        const val PM = false
+    }
+
+    init
+    {
+        if (Build.VERSION.SDK_INT >= 11)
+        {
+            setLayerType(LAYER_TYPE_SOFTWARE, null)
+        }
+        paint = Paint()
+        paint.isAntiAlias = true
+        paint.strokeCap = Paint.Cap.ROUND
+        paint.textAlign = Paint.Align.CENTER
+        rectF = RectF()
+        angle = -Math.PI / 2 + .001
+        hourFormat = DateFormat.is24HourFormat(getContext())
+        amPm = Calendar.getInstance()[Calendar.AM_PM] == 0
+        loadAppThemeDefaults()
+        loadAttributes(attrs)
+    }
 
     /**
      * Sets default theme attributes for picker
@@ -252,15 +282,15 @@ class Picker @JvmOverloads constructor(
 
             //Prefix Text
             textSize = prefixTextSizeInPixels
-            canvas.drawText("Arrive", -radius / 2.5f, (-radius / 1.65f) + offsetY, paint)
+            canvas.drawText(prefixText, -radius / 2.5f, (-radius / 1.65f) + offsetY, paint)
 
             //Day Text
             textSize = dayTextSizeInPixels
-            canvas.drawText("Monday", 0f, (paint.textSize * -2f) + offsetY, paint)
+            canvas.drawText(dayText, 0f, (paint.textSize * -2f) + offsetY, paint)
 
             //Suffix Text
             textSize = suffixTextSizeInPixels
-            canvas.drawText("At", radius / 2.5f, (-radius / 3f) + offsetY, paint)
+            canvas.drawText(suffixText, radius / 2.2f, (-radius / 3.5f) + offsetY, paint)
 
             //Time Text
             textSize = timeTextSizeInPixels
@@ -387,6 +417,11 @@ class Picker @JvmOverloads constructor(
     fun setTextColor(textColor: Int)
     {
         this.textColor = textColor
+        invalidate()
+    }
+
+    fun setDayText(newDayText: String) {
+        this.dayText = newDayText
         invalidate()
     }
 
@@ -564,32 +599,5 @@ class Picker @JvmOverloads constructor(
             (hour in 0..HALF_DAY_AS_HOURS
                     && minute >= 0 && minute <= AN_HOUR_AS_MINUTES)
         }
-    }
-
-    companion object
-    {
-        private const val AN_HOUR_AS_MINUTES = 60
-        private const val A_DAY_AS_HOURS = 24
-        private const val HALF_DAY_AS_HOURS = 12
-        const val AM = true
-        const val PM = false
-    }
-
-    init
-    {
-        if (Build.VERSION.SDK_INT >= 11)
-        {
-            setLayerType(LAYER_TYPE_SOFTWARE, null)
-        }
-        paint = Paint()
-        paint.isAntiAlias = true
-        paint.strokeCap = Paint.Cap.ROUND
-        paint.textAlign = Paint.Align.CENTER
-        rectF = RectF()
-        angle = -Math.PI / 2 + .001
-        hourFormat = DateFormat.is24HourFormat(getContext())
-        amPm = Calendar.getInstance()[Calendar.AM_PM] == 0
-        loadAppThemeDefaults()
-        loadAttributes(attrs)
     }
 }
