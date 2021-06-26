@@ -15,10 +15,15 @@
         android:checked="true"
         android:text="@string/pickerEnable" />
 
-    <io.flyingmongoose.EtzioTimePicker.Picker
+    <io.flyingmongoose.etzioTimePicker.TimePicker
         android:id="@+id/amPicker"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center_horizontal"/>
+
+    <io.flyingmongoose.etzioDayPicker.DayPicker
+        android:id="@+id/dayPicker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>

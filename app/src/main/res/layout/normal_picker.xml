@@ -6,7 +6,7 @@
     android:orientation="vertical"
     >
 
-    <io.flyingmongoose.EtzioTimePicker.Picker
+    <io.flyingmongoose.etzioTimePicker.TimePicker
         android:id="@+id/picker"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

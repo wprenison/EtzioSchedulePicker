@@ -1,4 +1,4 @@
-package io.flyingmongoose.EtzioTimePicker
+package io.flyingmongoose.etzioTimePicker
 
 import java.util.*
 

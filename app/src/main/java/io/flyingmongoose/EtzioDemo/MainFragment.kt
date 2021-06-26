@@ -9,8 +9,12 @@ import android.widget.Button
 import android.widget.CheckBox
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import io.flyingmongoose.EtzioTimePicker.Picker
-import io.flyingmongoose.EtzioTimePicker.TimeChangedListener
+import io.flyingmongoose.etzioDayPicker.DayFocusedListener
+import io.flyingmongoose.etzioDayPicker.DayPicker
+import io.flyingmongoose.etzioDayPicker.DayVModel
+import io.flyingmongoose.etzioTimePicker.TimePicker
+import io.flyingmongoose.etzioTimePicker.TimeChangedListener
+import kotlinx.android.synthetic.main.ampm_picker.*
 import java.util.*
 
 class MainFragment : Fragment(), TimeChangedListener
@@ -43,18 +47,36 @@ class MainFragment : Fragment(), TimeChangedListener
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val v = inflater.inflate(layoutID, container, false)
         if (layoutID == R.layout.ampm_picker) {
-            with(v.findViewById<View>(R.id.amPicker) as Picker) {
+            with(v.findViewById<View>(R.id.amPicker) as TimePicker) {
                 setClockColor(resources.getColor(R.color.clockColor))
                 setDialColor(resources.getColor(R.color.dialColor))
-                setTime(12, 45, io.flyingmongoose.EtzioTimePicker.Picker.AM)
+                setTime(12, 45, io.flyingmongoose.etzioTimePicker.TimePicker.AM)
                 setTrackSize(20)
                 setDialRadiusDP(60)
                 val checkBox = v.findViewById<View>(R.id.checkbox) as CheckBox
                 this.isEnabled = checkBox.isChecked
                 checkBox.setOnCheckedChangeListener { buttonView, isChecked -> this.isEnabled = isChecked }
             }
+
+            with(v.findViewById<View>(R.id.dayPicker) as DayPicker) {
+                setDayFocusedListener(object : DayFocusedListener
+                {
+                    override fun dayFocused(dayFocused: DayVModel.Weekdays?)
+                    {
+                        if(dayFocused == null)
+                        {
+                            amPicker.visibility = View.INVISIBLE
+                            return
+                        }
+
+
+                        amPicker.visibility = View.VISIBLE
+                        amPicker.setDayText(dayFocused.name)
+                    }
+                })
+            }
         } else {
-            val picker = v.findViewById<View>(R.id.picker) as Picker
+            val picker = v.findViewById<View>(R.id.picker) as TimePicker
             picker.setTimeChangedListener(this)
             val et = v.findViewById<View>(R.id.et) as TextView
             val btn = v.findViewById<View>(R.id.btn) as Button
